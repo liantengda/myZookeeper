@@ -25,31 +25,55 @@ import org.apache.zookeeper.KeeperException.SessionExpiredException;
 import org.apache.zookeeper.KeeperException.SessionMovedException;
 
 /**
+ * session追踪器接口
+ *
  * This is the basic interface that ZooKeeperServer uses to track sessions. The
  * standalone and leader ZooKeeperServer use the same SessionTracker. The
  * FollowerZooKeeperServer uses a SessionTracker which is basically a simple
  * shell to track information to be forwarded to the leader.
+ * 这是一个基础接口，zookeeper服务器用来追踪session的接口。
+ * 单例zookeeper服务端和zookeeper领导者服务端，用相同的session追踪器。
+ * 追随者zookeeper服务端用另一种session追踪器，基于一种简单的shell，提前于领导者追踪信息
  */
 public interface SessionTracker {
+    /**
+     * 内部接口
+     */
     public static interface Session {
         long getSessionId();
         int getTimeout();
         boolean isClosing();
     }
+
+    /**
+     * session过期
+     */
     public static interface SessionExpirer {
         void expire(Session session);
 
         long getServerId();
     }
 
+    /**
+     * 创建session
+     * @param sessionTimeout
+     * @return
+     */
+
     long createSession(int sessionTimeout);
 
+    /**
+     * 添加session
+     * @param id
+     * @param to
+     */
     void addSession(long id, int to);
 
     /**
      * @param sessionId
      * @param sessionTimeout
      * @return false if session is no longer active
+     * 如果session不再存活，就返回false
      */
     boolean touchSession(long sessionId, int sessionTimeout);
 

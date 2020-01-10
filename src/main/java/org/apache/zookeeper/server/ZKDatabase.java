@@ -190,6 +190,7 @@ public class ZKDatabase {
      * @return the data tree sessions
      */
     public Collection<Long> getSessions() {
+        System.out.println("返回在数据树中的session集合----->");
         return dataTree.getSessions();
     }
     

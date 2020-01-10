@@ -114,7 +114,9 @@ public class NIOServerCnxn extends ServerCnxn {
 
     /* Send close connection packet to the client, doIO will eventually
      * close the underlying machinery (like socket, selectorkey, etc...)
+     * 给客户端发送关闭连接的数据包，doIo最终将关闭如下运转部分 像socket，selectorkey，等等
      */
+    @Override
     public void sendCloseSession() {
         sendBuffer(ServerCnxnFactory.closeConn);
     }
@@ -141,8 +143,9 @@ public class NIOServerCnxn extends ServerCnxn {
            LOG.error("Error sending data synchronously ", ie);
        }
     }
-    
+    @Override
     public void sendBuffer(ByteBuffer bb) {
+        System.out.println("发送缓冲");
         try {
             internalSendBuffer(bb);
         } catch(Exception e) {
@@ -392,7 +395,7 @@ public class NIOServerCnxn extends ServerCnxn {
     private void readRequest() throws IOException {
         zkServer.processPacket(this, incomingBuffer);
     }
-    
+    @Override
     protected void incrOutstandingRequests(RequestHeader h) {
         if (h.getXid() >= 0) {
             synchronized (this) {
@@ -414,11 +417,11 @@ public class NIOServerCnxn extends ServerCnxn {
         }
 
     }
-
+    @Override
     public void disableRecv() {
         sk.interestOps(sk.interestOps() & (~SelectionKey.OP_READ));
     }
-
+    @Override
     public void enableRecv() {
         synchronized (this.factory) {
             sk.selector().wakeup();
@@ -486,7 +489,7 @@ public class NIOServerCnxn extends ServerCnxn {
 
         @Override
         public void close() throws IOException {
-            if (sb == null) return;
+            if (sb == null) {return;}
             checkFlush(true);
             sb = null; // clear out the ref to ensure no reuse
         }
@@ -518,8 +521,9 @@ public class NIOServerCnxn extends ServerCnxn {
         CommandThread(PrintWriter pw) {
             this.pw = pw;
         }
-        
+        @Override
         public void run() {
+            System.out.println("命令线程开启-------->");
             try {
                 commandRun();
             } catch (IOException ie) {
@@ -995,8 +999,9 @@ public class NIOServerCnxn extends ServerCnxn {
         incomingBuffer = ByteBuffer.allocate(len);
         return true;
     }
-
+    @Override
     public long getOutstandingRequests() {
+        System.out.println("这是什么鬼getOutstandingRequests---->");
         synchronized (this) {
             synchronized (this.factory) {
                 return outstandingRequests;
@@ -1009,6 +1014,7 @@ public class NIOServerCnxn extends ServerCnxn {
      *
      * @see org.apache.zookeeper.server.ServerCnxnIface#getSessionTimeout()
      */
+    @Override
     public int getSessionTimeout() {
         return sessionTimeout;
     }

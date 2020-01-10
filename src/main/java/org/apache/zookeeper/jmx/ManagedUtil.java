@@ -31,13 +31,16 @@ import org.apache.log4j.spi.LoggerRepository;
 
 /**
  * Shared utilities
+ * 第一步先进到这个里面
  */
 public class ManagedUtil {
     /**
      * Register the log4j JMX mbeans. Set environment variable
      * "zookeeper.jmx.log4j.disable" to true to disable registration.
      * @see http://logging.apache.org/log4j/1.2/apidocs/index.html?org/apache/log4j/jmx/package-summary.html
-     * @throws JMException if registration fails
+     * @throws JMException if registration fails   如果注册失败，就抛出JM异常，这不是运行时异常。
+     * 注册log4j  JMX对象，设置环境变量
+     *
      */
     @SuppressWarnings("rawtypes")
     public static void registerLog4jMBeans() throws JMException {

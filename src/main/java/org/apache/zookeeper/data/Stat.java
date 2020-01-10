@@ -141,6 +141,7 @@ public class Stat implements Record {
     a_.writeLong(pzxid,"pzxid");
     a_.endRecord(this,tag);
   }
+  @Override
   public void deserialize(InputArchive a_, String tag) throws java.io.IOException {
     a_.startRecord(tag);
     czxid=a_.readLong("czxid");
@@ -156,6 +157,7 @@ public class Stat implements Record {
     pzxid=a_.readLong("pzxid");
     a_.endRecord(tag);
 }
+@Override
   public String toString() {
     try {
       java.io.ByteArrayOutputStream s =
@@ -219,6 +221,7 @@ public class Stat implements Record {
     if (ret != 0) return ret;
      return ret;
   }
+  @Override
   public boolean equals(Object peer_) {
     if (!(peer_ instanceof Stat)) {
       return false;
@@ -252,6 +255,7 @@ public class Stat implements Record {
     if (!ret) return ret;
      return ret;
   }
+  @Override
   public int hashCode() {
     int result = 17;
     int ret;

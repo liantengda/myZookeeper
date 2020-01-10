@@ -28,6 +28,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -55,11 +59,45 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         new HashMap<InetAddress, Set<NettyServerCnxn>>( );
     InetSocketAddress localAddress;
     int maxClientCnxns = 60;
-    
+
+
+
+
+
+
     /**
+     * 备用知识
+     * Jboss是什么，一个基于J2EE的开放源代码的应用服务器，此处的包都来自jboss公司
+     * netty是什么，
+     * 客户端------服务端，相互通信，肯定需要输入输出流传输数据，如果使用传统的IO流，在传统的IO模型中，
+     * 每个连接创建成功之后都需要一个线程来维护，每个线程包含一个while死循环，那么1w个连接对应1w个线程，
+     * 继而1w个while死循环，这就带来如下几个问题：
+     * 1线程资源受限：线程是操作系统中非常宝贵的资源，同一时刻有大量的线程处于阻塞状态是非常严重的资源浪费，操作系统耗不起
+     * 2线程切换效率低下：单机cpu核数固定，线程爆炸之后操作系统频繁进行线程切换，应用性能急剧下降。
+     * 3除了以上两个问题，IO编程中，我们看到数据读写是以字节流为单位，效率不高。
+     * 为了解决这三个问题，JDK在1.4之后提出了NIO。
+     * NIO编程模型中，新来一个连接不再创建一个新的线程，而是可以把这条连接直接绑定到某个固定的线程，
+     * 然后这条连接所有的读写都由这个线程来负责，
+     *这就是NIO模型中selector的作用，一条连接来了之后，现在不创建一个while死循环去监听是否有数据可读了，
+     * 而是直接把这条连接注册到selector上，然后，通过检查这个selector，就可以批量监测出有数据可读的连接，
+     * 进而读取数据，
+     * NIO解决这个问题的方式是数据读写不再以字节为单位，而是以字节块为单位
+     * NIO模型中通常会有两个线程，每个线程绑定一个轮询器selector，在我们这个例子中serverSelector负责轮询是否有新的连接，clientSelector负责轮询连接是否有数据可读
+     * JDK的NIO底层由epoll实现，该实现饱受诟病的空轮训bug会导致cpu飙升100%
+     * Netty是一个异步事件驱动的网络应用框架，用于快速开发可维护的高性能服务器和客户端。
+     *
+     * ChannelHandler类似于Servlet的Filter过滤器，负责对I/O事件或者I/O操作进行拦截和处理，
+     * 它可以选择性地拦截和处理自己感兴趣的事件，也可以透传和终止事件的传递。基于ChannelHandler接口，
+     * 用户可以方便地进行业务逻辑定制，例如打印日志、统一封装异常信息、性能统计和消息编解码等。
+     *
+     *
+     *
+     *
      * This is an inner class since we need to extend SimpleChannelHandler, but
      * NettyServerCnxnFactory already extends ServerCnxnFactory. By making it inner
      * this class gets access to the member variables and methods.
+     * 这是一个内部类，因为我们需要继承SimpleChannelHandler，但是NettyServerCnxnFactory已经继承了ServerCnxnFactory
+     * ，通过创建这个内部类，来联通这个类的方法个变量
      */
     @Sharable
     class CnxnChannelHandler extends SimpleChannelHandler {
@@ -68,6 +106,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
             throws Exception
         {
+            System.out.println("关闭通道------>");
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Channel closed " + e);
             }
@@ -78,6 +117,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
         public void channelConnected(ChannelHandlerContext ctx,
                 ChannelStateEvent e) throws Exception
         {
+            System.out.println("连接通道---->");
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Channel connected " + e);
             }
@@ -243,6 +283,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     CnxnChannelHandler channelHandler = new CnxnChannelHandler();
     
     NettyServerCnxnFactory() {
+        System.out.println("构造NettyServerCnxnFactory");
         bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(
                         Executors.newCachedThreadPool(),
@@ -308,11 +349,13 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     }
 
     /** {@inheritDoc} */
+    @Override
     public int getMaxClientCnxnsPerHost() {
         return maxClientCnxns;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setMaxClientCnxnsPerHost(int max) {
         maxClientCnxns = max;
     }

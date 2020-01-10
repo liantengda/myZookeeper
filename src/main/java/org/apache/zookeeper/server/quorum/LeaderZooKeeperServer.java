@@ -42,14 +42,18 @@ public class LeaderZooKeeperServer extends QuorumZooKeeperServer {
     CommitProcessor commitProcessor;
 
     /**
-     * @param port
-     * @param dataDir
+     *
+     * @param logFactory
+     * @param self
+     * @param treeBuilder
+     * @param zkDb
      * @throws IOException
      */
     LeaderZooKeeperServer(FileTxnSnapLog logFactory, QuorumPeer self,
             DataTreeBuilder treeBuilder, ZKDatabase zkDb) throws IOException {
         super(logFactory, self.tickTime, self.minSessionTimeout,
                 self.maxSessionTimeout, treeBuilder, zkDb, self);
+        System.out.println("构建领导者zookeeper服务端------>");
     }
 
     public Leader getLeader(){
@@ -58,6 +62,7 @@ public class LeaderZooKeeperServer extends QuorumZooKeeperServer {
     
     @Override
     protected void setupRequestProcessors() {
+        System.out.println("设置请求处理者----->");
         RequestProcessor finalProcessor = new FinalRequestProcessor(this);
         RequestProcessor toBeAppliedProcessor = new Leader.ToBeAppliedRequestProcessor(
                 finalProcessor, getLeader().toBeApplied);

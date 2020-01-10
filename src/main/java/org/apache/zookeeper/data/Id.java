@@ -45,18 +45,21 @@ public class Id implements Record {
   public void setId(String m_) {
     id=m_;
   }
+  @Override
   public void serialize(OutputArchive a_, String tag) throws java.io.IOException {
     a_.startRecord(this,tag);
     a_.writeString(scheme,"scheme");
     a_.writeString(id,"id");
     a_.endRecord(this,tag);
   }
+  @Override
   public void deserialize(InputArchive a_, String tag) throws java.io.IOException {
     a_.startRecord(tag);
     scheme=a_.readString("scheme");
     id=a_.readString("id");
     a_.endRecord(tag);
 }
+@Override
   public String toString() {
     try {
       java.io.ByteArrayOutputStream s =
@@ -93,6 +96,7 @@ public class Id implements Record {
     if (ret != 0) return ret;
      return ret;
   }
+  @Override
   public boolean equals(Object peer_) {
     if (!(peer_ instanceof Id)) {
       return false;
@@ -108,6 +112,7 @@ public class Id implements Record {
     if (!ret) return ret;
      return ret;
   }
+  @Override
   public int hashCode() {
     int result = 17;
     int ret;

@@ -1,20 +1,3 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.zookeeper.server.quorum;
 
 import java.io.BufferedReader;
@@ -64,6 +47,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * 备用知识
+ * Write all read one(WARO) 机制---------->
+ * WARO的意思是：在更新时写所有副本，只有在所有副本中更新成功才算成功 ，保证了所有副本中数据的一致性，读取时可以读任意副本数据。
+ * Quorum机制-------->
+ * 对WARO条件进行松弛，对读写服务可用性做折中。
+ *
+ * Quorum机制：当更新操作wi 在N个节点中的W个节点上更新成功，称之为“成功提交的更新操作”。由于更新操作wiwi在W个节点上更新成功，所以在读数据时，令R>N−WR>N−W，最多读取R个节点副本一定能读到更新操作wiwi 更新后的数据vivi。
+ *
+ * 说白了，在更新操作wiwi成功提交后，R+W>N，那么读取的R个节点一定会与更新成功的W个节点有交集。此时你是否想到了鸽巢原理。
+ *
+ * 当W=N,R=1时，就可以得到WARO机制，所以WARO是Quorum的特例。
+ *
  * This class manages the quorum protocol. There are three states this server
  * can be in:
  * <ol>
@@ -89,6 +84,16 @@ import org.slf4j.LoggerFactory;
  * </pre>
  *
  * The request for the current leader will consist solely of an xid: int xid;
+ * 这个类管理着quorum协议
+ * 服务端在协议里可以有三种状态，
+ * leader选举
+ * leader
+ * follower
+ *
+ * 这个类将会简历一个数据表socket，将总是回应当前leader的视觉，这个回应将采取如下形式
+ * int xid  long myid   long leader_id  long leader_zxid
+ * 对于当前leader的请求，将仅仅有单个 xid 组成。
+ * @Reader liantengda
  */
 public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider {
     private static final Logger LOG = LoggerFactory.getLogger(QuorumPeer.class);
@@ -318,6 +323,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     /**
      * get the id of this quorum peer.
      */
+    @Override
     public long getId() {
         return myid;
     }
@@ -604,8 +610,11 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
         this.logFactory = new FileTxnSnapLog(dataLogDir, dataDir);
         this.zkDb = new ZKDatabase(this.logFactory);
         if(quorumConfig == null)
+        {
             this.quorumConfig = new QuorumMaj(countParticipants(quorumPeers));
-        else this.quorumConfig = quorumConfig;
+        } else {
+            this.quorumConfig = quorumConfig;
+        }
     }
 
     public void initialize() throws SaslException {
@@ -857,12 +866,13 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     }
 
     synchronized public ZooKeeperServer getActiveServer(){
-        if(leader!=null)
+        if(leader!=null){
             return leader.zk;
-        else if(follower!=null)
+        } else if(follower!=null){
             return follower.zk;
-        else if (observer != null)
+        } else if (observer != null){
             return observer.zk;
+        }
         return null;
     }
 
@@ -1096,6 +1106,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
     /**
      * Only used by QuorumStats at the moment
      */
+    @Override
     public String[] getQuorumPeers() {
         List<String> l = new ArrayList<String>();
         synchronized (this) {
@@ -1103,8 +1114,9 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
                 for (LearnerHandler fh : leader.getLearners()) {
                     if (fh.getSocket() != null) {
                         String s = fh.getSocket().getRemoteSocketAddress().toString();
-                        if (leader.isLearnerSynced(fh))
+                        if (leader.isLearnerSynced(fh)){
                             s += "*";
+                        }
                         l.add(s);
                     }
                 }
@@ -1114,7 +1126,7 @@ public class QuorumPeer extends ZooKeeperThread implements QuorumStats.Provider 
         }
         return l.toArray(new String[0]);
     }
-
+    @Override
     public String getServerState() {
         switch (getPeerState()) {
         case LOOKING:

@@ -31,17 +31,23 @@ public class LeaderBean extends ZooKeeperServerBean implements LeaderMXBean {
     
     public LeaderBean(Leader leader, ZooKeeperServer zks) {
         super(zks);
+        String string="";
+        if(leader!=null){
+            ProposalStats proposalStats = leader.getProposalStats();
+            string = proposalStats.toString();
+        }
+        System.out.println("构建领导者----->"+string);
         this.leader = leader;
     }
-    
+    @Override
     public String getName() {
         return "Leader";
     }
-
+    @Override
     public String getCurrentZxid() {
         return "0x" + Long.toHexString(zks.getZxid());
     }
-    
+    @Override
     public String followerInfo() {
         StringBuilder sb = new StringBuilder();
         for (LearnerHandler handler : leader.getLearners()) {

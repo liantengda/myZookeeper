@@ -24,8 +24,11 @@ import org.apache.zookeeper.common.Time;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
+/**备用知识
+ * Latency，中文译作延迟。Throughput，中文译作吞吐量。它们是衡量软件系统的最常见的两个指标。
  * Basic Server Statistics
+ * 基础的服务端统计数据
+ * 服务端状态类
  */
 public class ServerStats {
     private long packetsSent;
@@ -46,6 +49,7 @@ public class ServerStats {
     }
     
     public ServerStats(Provider provider) {
+        System.out.println("构造服务器状态类------->");
         this.provider = provider;
     }
     
