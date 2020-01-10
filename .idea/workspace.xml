@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ff116d09-a981-4358-9cb1-fd09e36ac083" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/org/apache/myNote/zookeeper场景" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="localRepository" value="D:\maven\ALY-repository" />
+        <option name="mavenHome" value="D:/maven/apache-maven-3.6.3" />
+        <option name="userSettingsFile" value="D:\maven\apache-maven-3.6.3\conf\ALY-settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1W9T14fiCsoBcizApGF1ccafXCQ" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="MavenSettings" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\zookeeper源码\zookeeper\src\main\java\org\apache\zookeeper\log" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\zookeeper源码\zookeeper\src\main\resources" />
+      <recent name="E:\zookeeper源码\zookeeper\src\main\java" />
+      <recent name="E:\zookeeper源码\zookeeper" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.ZooKeeperServerMain">
+    <configuration name="FourLetterWordMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.zookeeper.client.FourLetterWordMain" />
+      <module name="zookeeper" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.zookeeper.client.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ZooKeeperMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="org.apache.zookeeper.ZooKeeperMain" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.zookeeper.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ZooKeeperServerMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.apache.zookeeper.server.ZooKeeperServerMain" />
+      <module name="myZookeeper" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.apache.zookeeper.server.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ZooKeeperServerMain" />
+        <item itemvalue="Application.ZooKeeperMain" />
+        <item itemvalue="Application.FourLetterWordMain" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SshConsoleOptionsProvider">
+    <option name="myEncoding" value="UTF-8" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\lenovo\AppData\Roaming\Subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ff116d09-a981-4358-9cb1-fd09e36ac083" name="Default Changelist" comment="" />
+      <created>1578560592442</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1578560592442</updated>
+      <workItem from="1578560594923" duration="1728000" />
+      <workItem from="1578562397000" duration="8438000" />
+      <workItem from="1578573560789" duration="1367000" />
+      <workItem from="1578652720732" duration="5111000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="275" y="24" key="#Project_Structure" timestamp="1578652822152">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="275" y="24" key="#Project_Structure/0.0.1366.728@0.0.1366.728" timestamp="1578652822152" />
+    <state x="386" y="27" width="594" height="674" key="#ZooKeeperMain" timestamp="1578653471760">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="386" y="27" width="594" height="674" key="#ZooKeeperMain/0.0.1366.728@0.0.1366.728" timestamp="1578653471760" />
+    <state x="403" y="171" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1578656455202">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="403" y="171" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1366.728@0.0.1366.728" timestamp="1578656455202" />
+    <state x="235" y="0" key="CommitChangelistDialog2" timestamp="1578659070899">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="235" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1578659070899" />
+    <state x="659" y="111" key="FileChooserDialogImpl" timestamp="1578569548171">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="659" y="111" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1578569548171" />
+    <state width="1322" height="210" key="GridCell.Tab.0.bottom" timestamp="1578653511956">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1322" height="210" key="GridCell.Tab.0.bottom/0.0.1366.728@0.0.1366.728" timestamp="1578653511956" />
+    <state width="1322" height="210" key="GridCell.Tab.0.center" timestamp="1578653511956">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1322" height="210" key="GridCell.Tab.0.center/0.0.1366.728@0.0.1366.728" timestamp="1578653511956" />
+    <state width="1322" height="210" key="GridCell.Tab.0.left" timestamp="1578653511956">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1322" height="210" key="GridCell.Tab.0.left/0.0.1366.728@0.0.1366.728" timestamp="1578653511956" />
+    <state width="1322" height="210" key="GridCell.Tab.0.right" timestamp="1578653511956">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="1322" height="210" key="GridCell.Tab.0.right/0.0.1366.728@0.0.1366.728" timestamp="1578653511956" />
+    <state width="661" height="217" key="GridCell.Tab.1.bottom" timestamp="1578572961378">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="661" height="217" key="GridCell.Tab.1.bottom/0.0.1366.728@0.0.1366.728" timestamp="1578572961378" />
+    <state width="661" height="217" key="GridCell.Tab.1.center" timestamp="1578572961377">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="661" height="217" key="GridCell.Tab.1.center/0.0.1366.728@0.0.1366.728" timestamp="1578572961377" />
+    <state width="661" height="217" key="GridCell.Tab.1.left" timestamp="1578572961377">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="661" height="217" key="GridCell.Tab.1.left/0.0.1366.728@0.0.1366.728" timestamp="1578572961377" />
+    <state width="661" height="217" key="GridCell.Tab.1.right" timestamp="1578572961377">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state width="661" height="217" key="GridCell.Tab.1.right/0.0.1366.728@0.0.1366.728" timestamp="1578572961377" />
+    <state x="186" y="0" key="SettingsEditor" timestamp="1578652815688">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="186" y="0" key="SettingsEditor/0.0.1366.728@0.0.1366.728" timestamp="1578652815688" />
+    <state x="365" y="258" key="com.intellij.ide.util.TipDialog" timestamp="1578564159948">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="365" y="258" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1578564159948" />
+    <state x="424" y="49" width="672" height="678" key="search.everywhere.popup" timestamp="1578572548630">
+      <screen x="0" y="0" width="1366" height="728" />
+    </state>
+    <state x="424" y="49" width="672" height="678" key="search.everywhere.popup/0.0.1366.728@0.0.1366.728" timestamp="1578572548630" />
+  </component>
+</project>
