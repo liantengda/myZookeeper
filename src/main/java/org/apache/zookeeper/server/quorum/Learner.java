@@ -52,7 +52,10 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is the superclass of two of the three main actors in a ZK
  * ensemble: Followers and Observers. Both Followers and Observers share 
- * a good deal of code which is moved into Peer to avoid duplication. 
+ * a good deal of code which is moved into Peer to avoid duplication.
+ *
+ * 这个类是整个zookeeper中的主要执行者的超类，观察者和追随者。这两种角色都分享同一套代码，避免移动到Peer中产生重复。
+ * @Reader liantengda
  */
 public class Learner {       
     static class PacketInFlight {
@@ -83,6 +86,7 @@ public class Learner {
 
     static final private boolean nodelay = System.getProperty("follower.nodelay", "true").equals("true");
     static {
+        System.out.println("整个zookeeper中三分之二的观察者和追随者的超类leaner，学习者");
         LOG.info("TCP NoDelay set to: " + nodelay);
     }   
     

@@ -68,7 +68,17 @@ import org.slf4j.LoggerFactory;
  * message to the tail of the queue, thus changing the order of messages.
  * Although this is not a problem for the leader election, it could be a problem
  * when consolidating peer communication. This is to be verified, though.
- * 
+ * 这个类实现了一个连接管理者，为了leader选举，用TCP。
+ * 它维护了一个连接为每一对服务，心跳部分是为了确保每一对服务都有一个明确的连接，这些服务对，都可以通过网络正确地操作
+ * 和交流数据
+ *
+ * 如果两个服务对同时尝试开启一个连接，之后这个连接管理者用一个非常简单的平分机制去决定哪个连接应该被drop，基于两队
+ * 服务的ip地址。
+ *
+ * 对于每一个同类，管理者会维护一个消息队列，如果对于人格一个特殊的同类连接挂掉，之后，发送消息线程会把消息放回列表，
+ * 这个实现类当前用一个队列实现去维护发送给其他同类的消息，我们把这个消息加到队尾，这样，改变消息的顺序，尽管，这个对于
+ * leader选举没有影响，但是当合并同类交流时，会出现一个问题，这将被核实。
+ *
  */
 
 public class QuorumCnxManager {
@@ -76,16 +86,20 @@ public class QuorumCnxManager {
 
     /*
      * Maximum capacity of thread queues
+     * 线程队列最大容量
      */
     static final int RECV_CAPACITY = 100;
     // Initialized to 1 to prevent sending
     // stale notifications to peers
     static final int SEND_CAPACITY = 1;
-
+    /**
+     * 数据包最大尺寸
+     */
     static final int PACKETMAXSIZE = 1024 * 512;
 
     /*
      * Max buffer size to be read from the network.
+     * 从互联网上读取到的组大容量
      */
     static public final int maxBuffer = 2048;
     
@@ -117,6 +131,7 @@ public class QuorumCnxManager {
     private boolean quorumSaslAuthEnabled;
     /*
      * Counter to count connection processing threads.
+     * 计算连接处理线程的计数器
      */
     private AtomicInteger connectionThreadCnt = new AtomicInteger(0);
 
@@ -171,8 +186,10 @@ public class QuorumCnxManager {
                             boolean listenOnAllIPs,
                             int quorumCnxnThreadsSize,
                             boolean quorumSaslAuthEnabled) {
+
         this(mySid, view, authServer, authLearner, socketTimeout, listenOnAllIPs,
                 quorumCnxnThreadsSize, quorumSaslAuthEnabled, new ConcurrentHashMap<Long, SendWorker>());
+        System.out.println("构建消息队列管理者------>");
     }
 
     // visible for testing

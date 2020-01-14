@@ -32,6 +32,7 @@ class CsvInputArchive implements InputArchive {
     private PushbackReader stream;
     
     private class CsvIndex implements Index {
+        @Override
         public boolean done() {
             char c = '\0';
             try {
@@ -89,7 +90,7 @@ class CsvInputArchive implements InputArchive {
         String sval = readField(tag);
         return "T".equals(sval) ? true : false;
     }
-    
+    @Override
     public int readInt(String tag) throws IOException {
         return (int) readLong(tag);
     }

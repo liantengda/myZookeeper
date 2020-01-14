@@ -32,11 +32,14 @@ import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.data.StatPersistedV1;
 
 /**
+ * 备用知识
+ *  ACLs ----- >用于为文件系统提供更精细化的权限控制
  * This class contains the data for a node in the data tree.
  * <p>
  * A data node contains a reference to its parent, a byte array as its data, an
  * array of ACLs, a stat object, and a set of its children's paths.
- * 
+ * 这个类包含一个在数据树中的节点的数据
+ * 一个数据节点包含一个它父母的引用，一个字节数组作为他的数据，一个ACLs数组，一个状态对象，和一系列他的孩子们的路径。
  */
 public class DataNodeV1 implements Record {
     DataNodeV1() {
@@ -44,6 +47,7 @@ public class DataNodeV1 implements Record {
     }
 
     DataNodeV1(DataNodeV1 parent, byte data[], List<ACL> acl, StatPersistedV1 stat) {
+        System.out.println("构建数据节点------>");
         this.parent = parent;
         this.data = data;
         this.acl = acl;
@@ -91,7 +95,7 @@ public class DataNodeV1 implements Record {
         to.setDataLength(data.length);
         to.setNumChildren(children.size());
     }
-
+    @Override
     public void deserialize(InputArchive archive, String tag)
             throws IOException {
         archive.startRecord("node");
@@ -111,9 +115,10 @@ public class DataNodeV1 implements Record {
         stat.deserialize(archive, "stat");
         archive.endRecord("node");
     }
-
+    @Override
     synchronized public void serialize(OutputArchive archive, String tag)
             throws IOException {
+        System.out.println("序列化------>");
         archive.startRecord(this, "node");
         archive.writeBuffer(data, "data");
         archive.startVector(acl, "acl");

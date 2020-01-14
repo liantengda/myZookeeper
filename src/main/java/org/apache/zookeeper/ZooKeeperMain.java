@@ -53,7 +53,9 @@ import java.util.regex.Pattern;
 public class ZooKeeperMain {
     private static final Logger LOG = LoggerFactory.getLogger(ZooKeeperMain.class);
     static final Map<String,String> commandMap = new HashMap<String,String>( );
-
+    /**
+     * 我的参数选项，受保护引用成员。
+     */
     protected MyCommandOptions cl = new MyCommandOptions();
     protected HashMap<Integer,String> history = new HashMap<Integer,String>( );
     protected int commandCount = 0;
@@ -98,7 +100,9 @@ public class ZooKeeperMain {
     }
 
     private class MyWatcher implements Watcher {
+        @Override
         public void process(WatchedEvent event) {
+            System.out.println("捕捉事件---->"+event.toString());
             if (getPrintWatches()) {
                 ZooKeeperMain.printMessage("WATCHER::");
                 ZooKeeperMain.printMessage(event.toString());
@@ -186,6 +190,7 @@ public class ZooKeeperMain {
         }
 
         /**
+         * 解析一条命令行，它可能带有一个或者多个标志。
          * Parses a command line that may contain one or more flags
          * before an optional command string
          * @param args command line arguments
@@ -225,13 +230,14 @@ public class ZooKeeperMain {
         }
 
         /**
+         * 将一个字符串分成许多值，填入对应的命令list和参数list中
          * Breaks a string into command + arguments.
          * @param cmdstring string of form "cmd arg1 arg2..etc"
          * @return true if parsing succeeded.
          */
         public boolean parseCommand( String cmdstring ) {
             Matcher matcher = ARGS_PATTERN.matcher(cmdstring);
-
+            System.out.println("解析命令");
             List<String> args = new LinkedList<String>();
             while (matcher.find()) {
                 String value = matcher.group(1);
@@ -288,14 +294,19 @@ public class ZooKeeperMain {
     public static void main(String args[])
         throws KeeperException, IOException, InterruptedException
     {
-        args = new String[1];
-        args[0] = "E:\\zookeeper源码\\zoo\\conf\\zoo.cfg";
-        PropertyConfigurator.configure("E:\\zookeeper源码\\zookeeper\\src\\main\\java\\org\\apache\\zookeeper\\log\\log4j.properties");
+        PropertyConfigurator.configure("E:\\zookeeper\\zookeeper\\src\\main\\java\\org\\apache\\zookeeper\\log\\log4j.properties");
         ZooKeeperMain main = new ZooKeeperMain(args);
         main.run();
     }
 
+    /**
+     * 主方法第一层
+     * @param args
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public ZooKeeperMain(String args[]) throws IOException, InterruptedException {
+        System.out.println("——");
         cl.parseOptions(args);
         System.out.println("Connecting to " + cl.getOption("server"));
         connectToZK(cl.getOption("server"));

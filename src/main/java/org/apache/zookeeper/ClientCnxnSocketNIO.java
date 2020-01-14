@@ -39,7 +39,13 @@ import org.slf4j.LoggerFactory;
 public class ClientCnxnSocketNIO extends ClientCnxnSocket {
     private static final Logger LOG = LoggerFactory
             .getLogger(ClientCnxnSocketNIO.class);
-
+    /**
+     * 备用知识
+     *
+     * Selector 一般称 为选择器 ，当然你也可以翻译为 多路复用器 。它是Java NIO核心组件中的一个，用于检查一个或多个NIO Channel（通道）的状态是否处于可读、可写。
+     * 如此可以实现单线程管理多个channels,也就是可以管理多个网络链接。
+     * 使用Selector的好处在于： 使用更少的线程来就可以来处理通道了， 相比使用多个线程，避免了线程上下文切换带来的开销。
+     */
     private final Selector selector = Selector.open();
 
     private SelectionKey sockKey;
@@ -57,6 +63,7 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
      * @return true if a packet was received
      * @throws InterruptedException
      * @throws IOException
+     * 如果一个数据包被接收则返回true
      */
     void doIO(List<Packet> pendingQueue, LinkedList<Packet> outgoingQueue, ClientCnxn cnxn)
       throws InterruptedException, IOException {
@@ -65,38 +72,45 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
             throw new IOException("Socket is null!");
         }
         if (sockKey.isReadable()) {
+            System.out.print("读就绪----->");
             int rc = sock.read(incomingBuffer);
+            System.out.println("数据长度-->"+rc+"--->");
             if (rc < 0) {
+                System.out.print("撞墙换行------->");
                 throw new EndOfStreamException(
                         "Unable to read additional data from server sessionid 0x"
                                 + Long.toHexString(sessionId)
                                 + ", likely server has closed socket");
             }
             if (!incomingBuffer.hasRemaining()) {
-                incomingBuffer.flip();
+                System.out.print("接着读----->");
+                incomingBuffer.flip();//切换到读模式
                 if (incomingBuffer == lenBuffer) {
-                    recvCount++;
-                    readLength();
-                } else if (!initialized) {
-                    readConnectResult();
-                    enableRead();
+                    recvCount++;//接收次数+1
+                    readLength();//获取len并给incomingBuffer分配对应空间
+                } else if (!initialized) {//如果client和server的连接还没有初始化
+                    System.out.print("client和server还没有初始化---->");
+                    readConnectResult();//读取connect 回复
+                    enableRead();//启用读
                     if (findSendablePacket(outgoingQueue,
                             cnxn.sendThread.clientTunneledAuthenticationInProgress()) != null) {
                         // Since SASL authentication has completed (if client is configured to do so),
                         // outgoing packets waiting in the outgoingQueue can now be sent.
                         enableWrite();
+                        System.out.println("需要发送的数据包----->");
                     }
                     lenBuffer.clear();
-                    incomingBuffer = lenBuffer;
+                    incomingBuffer = lenBuffer;//还原incomingBuffer
                     updateLastHeard();
-                    initialized = true;
-                } else {
+                    initialized = true;//client和server连接初始化完成
+                } else {//如果已连接，并且已经给incomingBuffer分配了对应len的空间
                     sendThread.readResponse(incomingBuffer);
                     lenBuffer.clear();
-                    incomingBuffer = lenBuffer;
+                    incomingBuffer = lenBuffer;//还原incomingBuffer
                     updateLastHeard();
                 }
             }
+            System.out.println();
         }
         if (sockKey.isWritable()) {
             synchronized(outgoingQueue) {
@@ -112,17 +126,17 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                                 (p.requestHeader.getType() != OpCode.auth)) {
                             p.requestHeader.setXid(cnxn.getXid());
                         }
-                        p.createBB();
+                        p.createBB();//如果packet还没有生成byteBuffer，那就生成byteBuffer
                     }
                     sock.write(p.bb);
                     if (!p.bb.hasRemaining()) {
                         sentCount++;
-                        outgoingQueue.removeFirstOccurrence(p);
+                        outgoingQueue.removeFirstOccurrence(p);//从待发送队列中取出该packet
                         if (p.requestHeader != null
                                 && p.requestHeader.getType() != OpCode.ping
                                 && p.requestHeader.getType() != OpCode.auth) {
                             synchronized (pendingQueue) {
-                                pendingQueue.add(p);
+                                pendingQueue.add(p);//加入待回复的队列
                             }
                         }
                     }
@@ -133,7 +147,8 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
                     // from within ZooKeeperSaslClient (if client is configured
                     // to attempt SASL authentication), or in either doIO() or
                     // in doTransport() if not.
-                    disableWrite();
+                    System.out.print("没有啥要发的--->");
+                    disableWrite();//如果没有要发的，就禁止写
                 } else if (!initialized && p != null && !p.bb.hasRemaining()) {
                     // On initial connection, write the complete connect request
                     // packet, but then disable further writes until after
@@ -270,18 +285,36 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
      * @param sock the {@link SocketChannel} 
      * @param addr the address of remote host
      * @throws IOException
+     *
+     * 备用知识
+     * register() 方法的第二个参数。这是一个“ interest集合 ”，意思是在通过Selector监听Channel时对
+     * 什么事件感兴趣。可以监听四种不同类型的事件：
+     * Connect
+     * Accept
+     * Read
+     * Write
+     * 通道触发了一个事件意思是该事件已经就绪。比如某个Channel成功连接到另一个服务器称为“ 连接就绪 ”。
+     * 一个Server Socket Channel准备好接收新进入的连接称为“ 接收就绪 ”。一个有数据可读的通道可以说
+     * 是“ 读就绪 ”。等待写数据的通道可以说是“ 写就绪 ”。
      */
     void registerAndConnect(SocketChannel sock, InetSocketAddress addr) 
     throws IOException {
+        //注册，监听connect事件
         sockKey = sock.register(selector, SelectionKey.OP_CONNECT);
         boolean immediateConnect = sock.connect(addr);
-        if (immediateConnect) {
-            sendThread.primeConnection();
+        if (immediateConnect) {//如果立即建立了连接
+            sendThread.primeConnection();//client把watches和authData等数据发过去，并更新SelectionKey为读写
         }
     }
-    
+
+    /**
+     * 连接
+     * @param addr
+     * @throws IOException
+     */
     @Override
     void connect(InetSocketAddress addr) throws IOException {
+        System.out.println("与zookeeper服务端"+addr.getHostName()+"建立连接");
         SocketChannel sock = createSock();
         try {
            registerAndConnect(sock, addr);
@@ -341,11 +374,22 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
     synchronized void wakeupCnxn() {
         selector.wakeup();
     }
-    
+
+    /**
+     * 如果没有立即connect上，那么就在下面介绍的doTransport中等待SocketChannel finishConnect再调用
+     * @param waitTimeOut
+     * @param pendingQueue
+     * @param outgoingQueue
+     * @param cnxn
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Override
     void doTransport(int waitTimeOut, List<Packet> pendingQueue, LinkedList<Packet> outgoingQueue,
                      ClientCnxn cnxn)
             throws IOException, InterruptedException {
+
+        System.out.print("doTransport------->");
         selector.select(waitTimeOut);
         Set<SelectionKey> selected;
         synchronized (this) {
@@ -356,25 +400,31 @@ public class ClientCnxnSocketNIO extends ClientCnxnSocket {
         // Why we just have to do this once, here
         updateNow();
         for (SelectionKey k : selected) {
+            System.out.print("key:"+k.interestOps()+"-------->");
             SocketChannel sc = ((SocketChannel) k.channel());
+            //如果就绪的是connect事件，这个出现在registerAndConnect函数没有立即连接成功
             if ((k.readyOps() & SelectionKey.OP_CONNECT) != 0) {
-                if (sc.finishConnect()) {
-                    updateLastSendAndHeard();
-                    sendThread.primeConnection();
+                System.out.println("连接就绪------>");
+                if (sc.finishConnect()) {//如果次数完成了连接
+                    updateLastSendAndHeard();//更新时间
+                    sendThread.primeConnection();//client把watches和authData等数据发过去，并更新SelectionKey为读写
                 }
+                //如果就绪的是读或者写事件
             } else if ((k.readyOps() & (SelectionKey.OP_READ | SelectionKey.OP_WRITE)) != 0) {
-                doIO(pendingQueue, outgoingQueue, cnxn);
+                System.out.print("读就绪或者写就绪------>");
+                doIO(pendingQueue, outgoingQueue, cnxn);//利用pendingQueue和outgoingQueue进行IO
             }
         }
-        if (sendThread.getZkState().isConnected()) {
+        if (sendThread.getZkState().isConnected()) {//如果zk的state是已连接
+            System.out.println("已连接----->");
             synchronized(outgoingQueue) {
                 if (findSendablePacket(outgoingQueue,
-                        cnxn.sendThread.clientTunneledAuthenticationInProgress()) != null) {
-                    enableWrite();
+                        cnxn.sendThread.clientTunneledAuthenticationInProgress()) != null) {//如果有可以发送的packet
+                    enableWrite();//允许写
                 }
             }
         }
-        selected.clear();
+        selected.clear();//清空
     }
 
     //TODO should this be synchronized?

@@ -100,7 +100,7 @@ public class FourLetterWordMain {
     public static void main(String[] args)
             throws IOException
     {
-        PropertyConfigurator.configure("E:\\zookeeper源码\\zookeeper\\src\\main\\java\\org\\apache\\zookeeper\\log\\log4j.properties");
+        PropertyConfigurator.configure("E:\\zookeeper\\zookeeper\\src\\main\\java\\org\\apache\\zookeeper\\log\\log4j.properties");
         String[] s= {"127.0.0.1","2181","3"};
         args = s;
         if (args.length != 3) {

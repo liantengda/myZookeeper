@@ -119,7 +119,10 @@ public class FollowerZooKeeperServer extends LearnerZooKeeperServer {
         Request request = pendingTxns.remove();
         commitProcessor.commit(request);
     }
-    
+
+    /**
+     * zookeeper原语    sync 同步
+     */
     synchronized public void sync(){
         if(pendingSyncs.size() ==0){
             LOG.warn("Not expecting a sync.");

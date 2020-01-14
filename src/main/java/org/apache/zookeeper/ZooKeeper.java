@@ -42,51 +42,72 @@ import java.util.*;
  * service, an application must first instantiate an object of ZooKeeper class.
  * All the iterations will be done by calling the methods of ZooKeeper class.
  * The methods of this class are thread-safe unless otherwise noted.
+ * 这是zookeeper 客户端的主类，为了使用zookeeper服务，一个应用首先需要初始化一个zookeeper类的实例，
+ * 所有的迭代次数将被执行通过调用zookeeper类中的方法，这个类中的方法都是线程安全的，除非另有说明。
  * <p>
  * Once a connection to a server is established, a session ID is assigned to the
  * client. The client will send heart beats to the server periodically to keep
  * the session valid.
+ * 一旦一个对服务端的连接被建立，一个sessionId就会赋值给这个客户端，然后这个客户端将定时发送心跳给服务端，
+ * 来确保这个session可用。
  * <p>
  * The application can call ZooKeeper APIs through a client as long as the
  * session ID of the client remains valid.
+ * 只要客户端的session ID保持有效，那么这个应用就可以通过这个客户端调用zookeeper的API接口。
  * <p>
  * If for some reason, the client fails to send heart beats to the server for a
  * prolonged period of time (exceeding the sessionTimeout value, for instance),
  * the server will expire the session, and the session ID will become invalid.
  * The client object will no longer be usable. To make ZooKeeper API calls, the
  * application must create a new client object.
+ * 如果因为一些原因，这个客户端在较长一段时间没有发送心跳（例如超出了设置的超时时长），那么这个服务端将session
+ * 过期，同时sessionID 将变得无效。客户端实例将不再可用，为了继续可以调用zookeeper的函数，这个应用必须再创建
+ * 一个新的客户端实例。
  * <p>
  * If the ZooKeeper server the client currently connects to fails or otherwise
  * does not respond, the client will automatically try to connect to another
  * server before its session ID expires. If successful, the application can
  * continue to use the client.
+ * 如果zookeeper服务端服务端当前连接失败，或者没有响应，那么这个客户端在自己的sessionId过期之前
+ * 将自动的尝试连接其他的服务端，如果连接成功，这个应用可以继续使用这个客户端。
  * <p>
  * The ZooKeeper API methods are either synchronous or asynchronous. Synchronous
  * methods blocks until the server has responded. Asynchronous methods just queue
  * the request for sending and return immediately. They take a callback object that
  * will be executed either on successful execution of the request or on error with
  * an appropriate return code (rc) indicating the error.
+ * zookeeperAPT方法要么同步要么异步，同步方法阻塞直到服务端有响应，异步方法仅仅对请求的发送和回应进行
+ * 排队，他们拥有一个回调对象，无论成功请求或失败返回error都会执行
  * <p>
  * Some successful ZooKeeper API calls can leave watches on the "data nodes" in
  * the ZooKeeper server. Other successful ZooKeeper API calls can trigger those
  * watches. Once a watch is triggered, an event will be delivered to the client
  * which left the watch at the first place. Each watch can be triggered only
  * once. Thus, up to one event will be delivered to a client for every watch it
- * leaves.
+ * leaves.     至多一个
+ * 一些成功的zookeeper API调用会在zookeeper服务端的数据节点上留下一个监视器，其他成功的请求可以触发这些
+ * 监视器。一旦一个监视器被触发，一个事件将被发送至第一次留下这个监视器的客户端，每个监视器只能被触发一次，因此，
+ * 每个客户端，只能收到他曾经留下的每个监视器的一次回应。
+ *
  * <p>
  * A client needs an object of a class implementing Watcher interface for
  * processing the events delivered to the client.
+ * 一个客户端需要一个实现了watcher接口的类对象，来处理发送给客户端的响应事件。
  *
  * When a client drops the current connection and re-connects to a server, all the
  * existing watches are considered as being triggered but the undelivered events
  * are lost. To emulate this, the client will generate a special event to tell
  * the event handler a connection has been dropped. This special event has
  * EventType None and KeeperState Disconnected.
- *
+ *当一个客户端失去现有连接和重新连接一个服务端时， 所有的存活的监视器，都被认为正在被触发，但是这种不能发送
+ * 的事件将会消失。为了模仿这个，客户端将产生一个特殊的事件 告诉事件处理者 这个连接已经被弃用。这个特殊的事件
+ * 有？还是有    事件类型 None ， keeper状态  disconnected
  */
 @InterfaceAudience.Public
 public class ZooKeeper {
-
+    /**
+     * 这是什么写法  静态常量
+     */
     public static final String ZOOKEEPER_CLIENT_CNXN_SOCKET = "zookeeper.clientCnxnSocket";
 
     protected final ClientCnxn cnxn;
@@ -377,11 +398,13 @@ public class ZooKeeper {
      *             in cases of network failure
      * @throws IllegalArgumentException
      *             if an invalid chroot path is specified
+     * 初始化zookeeper，并且注册一个监视器
      */
     public ZooKeeper(String connectString, int sessionTimeout, Watcher watcher)
         throws IOException
     {
         this(connectString, sessionTimeout, watcher, false);
+        System.out.println("构造一个zookeeper--------->");
     }
 
     /**
@@ -439,6 +462,7 @@ public class ZooKeeper {
             boolean canBeReadOnly)
         throws IOException
     {
+        System.out.println("构造一个zookeeper-------->");
         LOG.info("Initiating client connection, connectString=" + connectString
                 + " sessionTimeout=" + sessionTimeout + " watcher=" + watcher);
 
@@ -1838,6 +1862,11 @@ public class ZooKeeper {
         return cnxn.sendThread.getClientCnxnSocket().getLocalSocketAddress();
     }
 
+    /**
+     * 获取socket连接
+     * @return
+     * @throws IOException
+     */
     private static ClientCnxnSocket getClientCnxnSocket() throws IOException {
         String clientCnxnSocketName = System
                 .getProperty(ZOOKEEPER_CLIENT_CNXN_SOCKET);

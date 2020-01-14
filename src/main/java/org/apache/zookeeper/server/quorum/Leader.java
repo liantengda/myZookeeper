@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class has the control logic for the Leader.
+ * 这个类写有领导者的控制逻辑
  */
 public class Leader {
     private static final Logger LOG = LoggerFactory.getLogger(Leader.class);
@@ -191,6 +192,7 @@ public class Leader {
     ServerSocket ss;
 
     Leader(QuorumPeer self,LeaderZooKeeperServer zk) throws IOException {
+        System.out.println("构建领导者-------->");
         this.self = self;
         this.proposalStats = new ProposalStats();
         try {
@@ -666,6 +668,7 @@ public class Leader {
          * 
          * @see org.apache.zookeeper.server.RequestProcessor#processRequest(org.apache.zookeeper.server.Request)
          */
+        @Override
         public void processRequest(Request request) throws RequestProcessorException {
             // request.addRQRec(">tobe");
             next.processRequest(request);
@@ -681,6 +684,7 @@ public class Leader {
          * 
          * @see org.apache.zookeeper.server.RequestProcessor#shutdown()
          */
+        @Override
         public void shutdown() {
             LOG.info("Shutting down");
             next.shutdown();
@@ -727,7 +731,7 @@ public class Leader {
     
     /**
      * Create an inform packet and send it to all observers.
-     * @param zxid
+     * @param
      * @param proposal
      */
     public void inform(Proposal proposal) {   
@@ -813,7 +817,7 @@ public class Leader {
     /**
      * Sends a sync message to the appropriate server
      * 
-     * @param f
+     * @param
      * @param r
      */
             

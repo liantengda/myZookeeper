@@ -134,6 +134,10 @@ public class DataTree {
 
 
     public Collection<Long> getSessions() {
+        System.out.println("concurrentHashMap的key就是session列表");
+        for(long key:ephemerals.keySet()){
+            System.out.println("遍历key："+key);
+        }
         return ephemerals.keySet();
     }
 

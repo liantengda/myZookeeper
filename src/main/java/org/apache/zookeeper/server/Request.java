@@ -18,6 +18,8 @@
 
 package org.apache.zookeeper.server;
 
+import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -34,8 +36,11 @@ import org.apache.zookeeper.txn.TxnHeader;
  * This is the structure that represents a request moving through a chain of
  * RequestProcessors. There are various pieces of information that is tacked
  * onto the request as it is processed.
+ *
+ * 这是一个结构体，代表一个请求，正在移动到一连串的请求处理者，由多种信息，
  */
 public class Request {
+    private static Integer  requestCount = 1;
     private static final Logger LOG = LoggerFactory.getLogger(Request.class);
 
     public final static Request requestOfDeath = new Request(null, 0, 0, 0,
@@ -50,6 +55,13 @@ public class Request {
      */
     public Request(ServerCnxn cnxn, long sessionId, int xid, int type,
             ByteBuffer bb, List<Id> authInfo) {
+        String server = "no one";
+       if(cnxn!=null){
+           InetSocketAddress remoteSocketAddress = cnxn.getRemoteSocketAddress();
+           server = remoteSocketAddress.toString();
+       }
+        System.out.println("构建请求------->"+sessionId+"向谁发起------->"+server);
+        System.out.println("发起请求次数------>"+Request.requestCount++);
         this.cnxn = cnxn;
         this.sessionId = sessionId;
         this.cxid = xid;

@@ -28,22 +28,28 @@ public class FollowerBean extends ZooKeeperServerBean implements FollowerMXBean 
     private final Follower follower;
 
     public FollowerBean(Follower follower, ZooKeeperServer zks) {
+
         super(zks);
+        long lastQueued = 0;
+        if(follower!=null){
+             lastQueued = follower.getLastQueued();
+        }
+        System.out.println("构造追随者"+lastQueued);
         this.follower = follower;
     }
-    
+    @Override
     public String getName() {
         return "Follower";
     }
-
+    @Override
     public String getQuorumAddress() {
         return follower.sock.toString();
     }
-    
+    @Override
     public String getLastQueuedZxid() {
         return "0x" + Long.toHexString(follower.getLastQueued());
     }
-    
+    @Override
     public int getPendingRevalidationCount() {
         return follower.getPendingRevalidationsCount();
     }

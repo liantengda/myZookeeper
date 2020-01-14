@@ -39,10 +39,14 @@ import org.apache.zookeeper.common.Time;
  * interval. It always rounds up the tick interval to provide a sort of grace
  * period. Sessions are thus expired in batches made up of sessions that expire
  * in a given interval.
+ * session追踪器实现类
+ * 这是一个拥有全部特性的session追踪器，根据心跳间隔分组追踪session， 它总是对心跳间隔取整，来提供一组优雅的时间间隔分类
+ * 因此一批过期的session会由在一个给定的过期时间间隔内的session组成。
  */
 public class SessionTrackerImpl extends ZooKeeperCriticalThread implements SessionTracker {
-    private static final Logger LOG = LoggerFactory.getLogger(SessionTrackerImpl.class);
 
+    private static final Logger LOG = LoggerFactory.getLogger(SessionTrackerImpl.class);
+    private static Integer addCountTotal = 1;
     HashMap<Long, SessionImpl> sessionsById = new HashMap<Long, SessionImpl>();
 
     HashMap<Long, SessionSet> sessionSets = new HashMap<Long, SessionSet>();
@@ -53,6 +57,9 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
 
     int expirationInterval;
 
+    /**
+     * 静态内部类
+     */
     public static class SessionImpl implements Session {
         SessionImpl(long sessionId, int timeout, long expireTime) {
             this.sessionId = sessionId;
@@ -67,9 +74,11 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         boolean isClosing;
 
         Object owner;
-
+        @Override
         public long getSessionId() { return sessionId; }
+        @Override
         public int getTimeout() { return timeout; }
+        @Override
         public boolean isClosing() { return isClosing; }
     }
 
@@ -110,6 +119,11 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
 
     volatile long currentTime;
 
+    /**
+     *
+     * @param pwriter the output writer
+     */
+    @Override
     synchronized public void dumpSessions(PrintWriter pwriter) {
         pwriter.print("Session Sets (");
         pwriter.print(sessionSets.size());
@@ -163,6 +177,13 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         LOG.info("SessionTrackerImpl exited loop!");
     }
 
+    /**
+     *
+     * @param sessionId
+     * @param timeout
+     * @return
+     */
+    @Override
     synchronized public boolean touchSession(long sessionId, int timeout) {
         if (LOG.isTraceEnabled()) {
             ZooTrace.logTraceMessage(LOG,
@@ -194,7 +215,14 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         return true;
     }
 
+    /**
+     *
+     * @param sessionId
+     */
+    @Override
     synchronized public void setSessionClosing(long sessionId) {
+        System.out.println("设置session正在关闭------->"+sessionId);
+        addCountTotal--;
         if (LOG.isTraceEnabled()) {
             LOG.info("Session closing: 0x" + Long.toHexString(sessionId));
         }
@@ -205,7 +233,17 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         s.isClosing = true;
     }
 
+    /**
+     *
+     * @param sessionId
+     */
+    @Override
     synchronized public void removeSession(long sessionId) {
+        System.out.println("去除session------->"+sessionId);
+        //这是我自己填的，大家别在意，可以注释掉。
+        synchronized (addCountTotal){
+            System.out.println("剩余session数量------>"+addCountTotal--);
+        }
         SessionImpl s = sessionsById.remove(sessionId);
         sessionsWithTimeout.remove(sessionId);
         if (LOG.isTraceEnabled()) {
@@ -222,9 +260,12 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         }
     }
 
+    /**
+     *
+     */
+    @Override
     public void shutdown() {
         LOG.info("Shutting down");
-
         running = false;
         if (LOG.isTraceEnabled()) {
             ZooTrace.logTraceMessage(LOG, ZooTrace.getTextTraceLevel(),
@@ -232,17 +273,21 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         }
     }
 
-
+    @Override
     synchronized public long createSession(int sessionTimeout) {
+        System.out.println("构建session"+nextSessionId);
         addSession(nextSessionId, sessionTimeout);
         return nextSessionId++;
     }
-
+    @Override
     synchronized public void addSession(long id, int sessionTimeout) {
+        System.out.println("添加session"+id);
         sessionsWithTimeout.put(id, sessionTimeout);
         if (sessionsById.get(id) == null) {
+
             SessionImpl s = new SessionImpl(id, sessionTimeout, 0);
             sessionsById.put(id, s);
+            System.out.println("已经添加session数量"+SessionTrackerImpl.addCountTotal++);
             if (LOG.isTraceEnabled()) {
                 ZooTrace.logTraceMessage(LOG, ZooTrace.SESSION_TRACE_MASK,
                         "SessionTrackerImpl --- Adding session 0x"
@@ -256,9 +301,19 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
             }
         }
         touchSession(id, sessionTimeout);
+
     }
 
+    /**
+     *
+     * @param sessionId
+     * @param owner
+     * @throws KeeperException.SessionExpiredException
+     * @throws KeeperException.SessionMovedException
+     */
+    @Override
     synchronized public void checkSession(long sessionId, Object owner) throws KeeperException.SessionExpiredException, KeeperException.SessionMovedException {
+        System.out.println("检验session-------->"+sessionId);
         SessionImpl session = sessionsById.get(sessionId);
         if (session == null || session.isClosing()) {
             throw new KeeperException.SessionExpiredException();
@@ -270,7 +325,15 @@ public class SessionTrackerImpl extends ZooKeeperCriticalThread implements Sessi
         }
     }
 
+    /**
+     *
+     * @param id
+     * @param owner
+     * @throws SessionExpiredException
+     */
+    @Override
     synchronized public void setOwner(long id, Object owner) throws SessionExpiredException {
+        System.out.println("设置session的拥有者"+owner+"--->"+id);
         SessionImpl session = sessionsById.get(id);
         if (session == null || session.isClosing()) {
             throw new KeeperException.SessionExpiredException();

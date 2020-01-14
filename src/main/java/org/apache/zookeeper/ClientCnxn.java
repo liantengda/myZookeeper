@@ -109,8 +109,12 @@ public class ClientCnxn {
     /** This controls whether automatic watch resetting is enabled.
      * Clients automatically reset watches during session reconnect, this
      * option allows the client to turn off this behavior by setting
-     * the environment variable "zookeeper.disableAutoWatchReset" to "true" */
+     * the environment variable "zookeeper.disableAutoWatchReset" to "true"
+     * 这个变量控制   自动重置监视者 是否生效，客户端在session重置期间自动重置监视器，
+     * 这个选项允许客户端关闭这种行为 通过设置变量值为true。
+     */
     private static boolean disableAutoWatchReset;
+
     static {
         // this var should not be public, but otw there is no easy way
         // to test
@@ -133,15 +137,33 @@ public class ClientCnxn {
         byte data[];
     }
 
+    /**
+     * 备用知识
+     *
+     * 它是线程安全的无序的集合，可以将它理解成线程安全的HashSet。有意思的是，CopyOnWriteArraySet和HashSet
+     * 虽然都继承于共同的父类AbstractSet；但是，HashSet是通过“散列表(HashMap)”实现的，而CopyOnWriteArraySet
+     * 则是通过“动态数组(CopyOnWriteArrayList)”实现的，并不是散列表。
+     * 和CopyOnWriteArrayList类似，其实CopyOnWriteSet底层包含一个CopyOnWriteList，几乎所有操作都是借助
+     * CopyOnWriteList，就像HashSet包含HashMap
+     * CopyOnWriteArraySet具有以下特性：
+     * 1. 它最适合于具有以下特征的应用程序：Set 大小通常保持很小，只读操作远多于可变操作，需要在遍历期间防止线程间
+     * 的冲突。
+     * 2. 它是线程安全的。
+     * 3. 因为通常需要复制整个基础数组，所以可变操作（add()、set() 和 remove() 等等）的开销很大。
+     * 4. 迭代器支持hasNext(), next()等不可变操作，但不支持可变 remove()等 操作。
+     * 5. 使用迭代器进行遍历的速度很快，并且不会与其他线程发生冲突。在构造迭代器时，迭代器依赖于不变的数组快照。
+     */
     private final CopyOnWriteArraySet<AuthData> authInfo = new CopyOnWriteArraySet<AuthData>();
 
     /**
      * These are the packets that have been sent and are waiting for a response.
+     * 这里面是已经被发送的正在等待响应的包
      */
     private final LinkedList<Packet> pendingQueue = new LinkedList<Packet>();
 
     /**
      * These are the packets that need to be sent.
+     * 这里面是那些需要发送的包
      */
     private final LinkedList<Packet> outgoingQueue = new LinkedList<Packet>();
 
@@ -285,7 +307,7 @@ public class ClientCnxn {
         Packet(RequestHeader requestHeader, ReplyHeader replyHeader,
                Record request, Record response,
                WatchRegistration watchRegistration, boolean readOnly) {
-
+            System.out.println("构建数据包");
             this.requestHeader = requestHeader;
             this.replyHeader = replyHeader;
             this.request = request;
@@ -484,8 +506,11 @@ public class ClientCnxn {
        public void queuePacket(Packet packet) {
           if (wasKilled) {
              synchronized (waitingEvents) {
-                if (isRunning) waitingEvents.add(packet);
-                else processEvent(packet);
+                if (isRunning) {
+                    waitingEvents.add(packet);
+                } else {
+                    processEvent(packet);
+                }
              }
           } else {
              waitingEvents.add(packet);
@@ -879,16 +904,20 @@ public class ClientCnxn {
             LOG.info("Socket connection established to "
                      + clientCnxnSocket.getRemoteSocketAddress()
                      + ", initiating session");
+            System.out.println("socket连接首次建立，进入一个神奇的方法----->ClientCnxn");
             isFirstConnect = false;
             long sessId = (seenRwServerBefore) ? sessionId : 0;
             ConnectRequest conReq = new ConnectRequest(0, lastZxid,
                     sessionTimeout, sessId, sessionPasswd);
+
             synchronized (outgoingQueue) {
                 // We add backwards since we are pushing into the front
                 // Only send if there's a pending watch
                 // TODO: here we have the only remaining use of zooKeeper in
                 // this class. It's to be eliminated!
+                System.out.println("进入outgoin队列------->");
                 if (!disableAutoWatchReset) {
+                    System.out.println("自动化重置监视器功能健在--------->");
                     List<String> dataWatches = zooKeeper.getDataWatches();
                     List<String> existWatches = zooKeeper.getExistWatches();
                     List<String> childWatches = zooKeeper.getChildWatches();
@@ -934,16 +963,19 @@ public class ClientCnxn {
                             h.setType(OpCode.setWatches);
                             h.setXid(-8);
                             Packet packet = new Packet(h, new ReplyHeader(), sw, null, null);
+                            System.out.println("封装好数据包------>"+packet.requestHeader);
                             outgoingQueue.addFirst(packet);
                         }
                     }
                 }
 
                 for (AuthData id : authInfo) {
+                    System.out.println("数据包入队------>");
                     outgoingQueue.addFirst(new Packet(new RequestHeader(-4,
                             OpCode.auth), null, new AuthPacket(0, id.scheme,
                             id.data), null, null));
                 }
+                System.out.println("最后一个数据包入队");
                 outgoingQueue.addFirst(new Packet(null, null, conReq,
                             null, null, readOnly));
             }

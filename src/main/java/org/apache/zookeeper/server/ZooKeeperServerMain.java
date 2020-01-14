@@ -24,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javax.management.JMException;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.yetus.audience.InterfaceAudience;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import org.apache.zookeeper.server.quorum.QuorumPeerConfig.ConfigException;
 
 /**
  * This class starts and runs a standalone ZooKeeperServer.
+ * 这个类用来启动和运行一个单例的zookeeper服务端
  */
 @InterfaceAudience.Public
 public class ZooKeeperServerMain {
@@ -50,6 +52,11 @@ public class ZooKeeperServerMain {
      * @param args the configfile or the port datadir [ticktime]
      */
     public static void main(String[] args) {
+        //加载zookeeper配置文件
+        args = new String[1];
+        args[0] = "E:\\zookeeper\\zoo\\conf\\zoo.cfg";
+        //加载日志配置文件
+        PropertyConfigurator.configure("E:\\zookeeper\\zookeeper\\src\\main\\java\\org\\apache\\zookeeper\\log\\log4j.properties");
         ZooKeeperServerMain main = new ZooKeeperServerMain();
         try {
             main.initializeAndRun(args);
@@ -70,6 +77,12 @@ public class ZooKeeperServerMain {
         System.exit(0);
     }
 
+    /**
+     * 保护方法，初始化和运行
+     * @param args
+     * @throws ConfigException
+     * @throws IOException
+     */
     protected void initializeAndRun(String[] args)
         throws ConfigException, IOException
     {
@@ -81,8 +94,10 @@ public class ZooKeeperServerMain {
 
         ServerConfig config = new ServerConfig();
         if (args.length == 1) {
+            System.out.println("load cofig start"+"一个参数");
             config.parse(args[0]);
         } else {
+            System.out.println("load cofig start"+"多个参数");
             config.parse(args);
         }
 
@@ -105,6 +120,10 @@ public class ZooKeeperServerMain {
             final ZooKeeperServer zkServer = new ZooKeeperServer();
             // Registers shutdown handler which will be used to know the
             // server error or shutdown state changes.
+            /*countDownLatch这个类使一个线程等待其他线程各自执行完毕后再执行。
+            是通过一个计数器来实现的，计数器的初始值是线程的数量。每当一个线程执行完毕后，
+            计数器的值就-1，当计数器的值为0时，表示所有线程都执行完毕，然后在闭锁上等待的线程就可以恢复工作了。
+               */
             final CountDownLatch shutdownLatch = new CountDownLatch(1);
             zkServer.registerServerShutdownHandler(
                     new ZooKeeperServerShutdownHandler(shutdownLatch));
@@ -123,6 +142,7 @@ public class ZooKeeperServerMain {
             // Watch status of ZooKeeper server. It will do a graceful shutdown
             // if the server is not running or hits an internal error.
             shutdownLatch.await();
+            System.out.println("关闭zookeeper线程");
             shutdown();
 
             cnxnFactory.join();

@@ -29,6 +29,7 @@ import org.apache.zookeeper.server.ZooKeeperServerListener;
 /**
  * This is really just a shell of a SessionTracker that tracks session activity
  * to be forwarded to the Leader using a PING.
+ * 这仅仅是一个session追踪器，追踪session活动，在正在ping的leader之前
  */
 public class LearnerSessionTracker implements SessionTracker {
     SessionExpirer expirer;
@@ -48,20 +49,20 @@ public class LearnerSessionTracker implements SessionTracker {
         nextSessionId = SessionTrackerImpl.initializeNextSession(this.serverId);
         
     }
-
+    @Override
     synchronized public void removeSession(long sessionId) {
         sessionsWithTimeouts.remove(sessionId);
         touchTable.remove(sessionId);
     }
-
+    @Override
     public void shutdown() {
     }
-
+    @Override
     synchronized public void addSession(long sessionId, int sessionTimeout) {
         sessionsWithTimeouts.put(sessionId, sessionTimeout);
         touchTable.put(sessionId, sessionTimeout);
     }
-
+    @Override
     synchronized public boolean touchSession(long sessionId, int sessionTimeout) {
         touchTable.put(sessionId, sessionTimeout);
         return true;
@@ -73,25 +74,25 @@ public class LearnerSessionTracker implements SessionTracker {
         return oldTouchTable;
     }
 
-
+    @Override
     synchronized public long createSession(int sessionTimeout) {
         return (nextSessionId++);
     }
-
+    @Override
     public void checkSession(long sessionId, Object owner)  {
         // Nothing to do here. Sessions are checked at the Leader
     }
-    
+    @Override
     public void setOwner(long sessionId, Object owner) {
         // Nothing to do here. Sessions are checked at the Leader
     }
-
+    @Override
     public void dumpSessions(PrintWriter pwriter) {
     	// the original class didn't have tostring impl, so just
     	// dup what we had before
     	pwriter.println(toString());
     }
-
+    @Override
     public void setSessionClosing(long sessionId) {
         // Nothing to do here.
     }

@@ -43,11 +43,23 @@ import org.slf4j.LoggerFactory;
  */
 abstract class ClientCnxnSocket {
     private static final Logger LOG = LoggerFactory.getLogger(ClientCnxnSocket.class);
-
+    //是否初始化
     protected boolean initialized;
 
     /**
+     * 备用知识
+     * 在Java中当我们要对数据进行更底层的操作时，一般是操作数据的字节（byte）形式，这时经常会用到
+     * ByteBuffer这样一个类。ByteBuffer提供了两种静态实例方式：
+     * allocate
+     * allocateDirect
+     * 为什么要提供两种方式呢？这与Java的内存使用机制有关。第一种分配方式产生的内存开销是在JVM中的，
+     * 而另外一种的分配方式产生的开销在JVM之外，以就是系统级的内存分配。当Java程序接收到外部传来的数据时，
+     * 首先是被系统内存所获取，然后在由系统内存复制复制到JVM内存中供Java程序使用。所以在另外一种分配方式中，
+     * 能够省去复制这一步操作，效率上会有所提高。可是系统级内存的分配比起JVM内存的分配要耗时得多，
+     * 所以并非不论什么时候allocateDirect的操作效率都是最高的。
      * This buffer is only used to read the length of the incoming message.
+     * 仅仅用来读取 incoming message的长度
+     *
      */
     protected final ByteBuffer lenBuffer = ByteBuffer.allocateDirect(4);
 
@@ -61,6 +73,7 @@ abstract class ClientCnxnSocket {
     protected long lastHeard;
     protected long lastSend;
     protected long now;
+    //客户端通信的发送线程
     protected ClientCnxn.SendThread sendThread;
 
     /**
@@ -75,6 +88,7 @@ abstract class ClientCnxnSocket {
     }
 
     void updateNow() {
+        System.out.print("更新时间为当前时间------>");
         now = Time.currentElapsedTime();
     }
 
@@ -115,7 +129,12 @@ abstract class ClientCnxnSocket {
         incomingBuffer = ByteBuffer.allocate(len);
     }
 
+    /**
+     * 读取连接结果
+     * @throws IOException
+     */
     void readConnectResult() throws IOException {
+        System.out.println("ClientCnxnSocket readConnectResult------>");
         if (LOG.isTraceEnabled()) {
             StringBuilder buf = new StringBuilder("0x[");
             for (byte b : incomingBuffer.array()) {
@@ -125,9 +144,13 @@ abstract class ClientCnxnSocket {
             LOG.trace("readConnectResult " + incomingBuffer.remaining() + " "
                     + buf.toString());
         }
+        /**
+         *
+         */
         ByteBufferInputStream bbis = new ByteBufferInputStream(incomingBuffer);
         BinaryInputArchive bbia = BinaryInputArchive.getArchive(bbis);
         ConnectResponse conRsp = new ConnectResponse();
+        //反序列化
         conRsp.deserialize(bbia, "connect");
 
         // read "is read-only" flag

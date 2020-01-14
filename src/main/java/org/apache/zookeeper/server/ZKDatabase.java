@@ -55,6 +55,10 @@ import org.apache.zookeeper.txn.TxnHeader;
  * server states that includes the sessions, datatree and the
  * committed logs. It is booted up  after reading the logs
  * and snapshots from the disk.
+ *
+ * 这个类是zookeeper维护的内部数据库，保存了所有数据
+ * @Reader  liantengda
+ *
  */
 public class ZKDatabase {
     
@@ -82,6 +86,7 @@ public class ZKDatabase {
      */
     public ZKDatabase(FileTxnSnapLog snapLog) {
         dataTree = new DataTree();
+        System.out.println("构建zookeeper内部数据库---->"+snapLog.getDataDir().getAbsolutePath());
         sessionsWithTimeouts = new ConcurrentHashMap<Long, Integer>();
         this.snapLog = snapLog;
     }
@@ -102,6 +107,7 @@ public class ZKDatabase {
      * data structures in zkdatabase.
      */
     public void clear() {
+        System.out.println("<-------------清空数据库start------------------------>");
         minCommittedLog = 0;
         maxCommittedLog = 0;
         /* to be safe we just create a new 
@@ -117,6 +123,7 @@ public class ZKDatabase {
             lock.unlock();
         }
         initialized = false;
+        System.out.println("<--------------------------------数据库清空完毕-------------------->");
     }
     
     /**
@@ -190,6 +197,7 @@ public class ZKDatabase {
      * @return the data tree sessions
      */
     public Collection<Long> getSessions() {
+        System.out.println("返回在数据树中的session集合----->");
         return dataTree.getSessions();
     }
     
@@ -202,6 +210,7 @@ public class ZKDatabase {
     }
 
     private final PlayBackListener commitProposalPlaybackListener = new PlayBackListener() {
+        @Override
         public void onTxnLoaded(TxnHeader hdr, Record txn){
             addCommittedProposal(hdr, txn);
         }

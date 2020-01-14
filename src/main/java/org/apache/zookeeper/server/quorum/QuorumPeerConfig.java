@@ -44,13 +44,19 @@ import org.apache.zookeeper.server.quorum.flexible.QuorumHierarchical;
 import org.apache.zookeeper.server.quorum.flexible.QuorumMaj;
 import org.apache.zookeeper.server.quorum.flexible.QuorumVerifier;
 
+/**
+ * 这是个啥类
+ */
 @InterfaceAudience.Public
 public class QuorumPeerConfig {
     private static final Logger LOG = LoggerFactory.getLogger(QuorumPeerConfig.class);
 
     protected InetSocketAddress clientPortAddress;
+    //数据目录
     protected String dataDir;
+    //数据日志目录
     protected String dataLogDir;
+    //默认心跳时间
     protected int tickTime = ZooKeeperServer.DEFAULT_TICK_TIME;
     protected int maxClientCnxns = 60;
     /** defaults to -1 if not set explicitly */
@@ -175,10 +181,13 @@ public class QuorumPeerConfig {
             } else if (key.equals("dataLogDir")) {
                 dataLogDir = value;
             } else if (key.equals("clientPort")) {
+                System.out.println("获取端口---->"+zkProp.get("clientPort"));
                 clientPort = Integer.parseInt(value);
             } else if (key.equals("clientPortAddress")) {
+                System.out.println("获取主机地址"+zkProp.get("clientPortAddress"));
                 clientPortAddress = value.trim();
             } else if (key.equals("tickTime")) {
+                System.out.println("获取心跳时间--->"+zkProp.get("tickTime"));
                 tickTime = Integer.parseInt(value);
             } else if (key.equals("maxClientCnxns")) {
                 maxClientCnxns = Integer.parseInt(value);

@@ -21,23 +21,39 @@ package org.apache.zookeeper;
 import org.apache.yetus.audience.InterfaceAudience;
 
 /**
+ * 备用知识
+ * InterfaceAudience 类包含三个注解类型，用来被说明被他们注解的类型的潜在的使用范围（audience）。
+ * @InterfaceAudience.Public： 对所有工程和应用可用
+ * @InterfaceAudience.LimitedPrivate： 仅限于某些本项目的衍生外围项目
+ * @InterfaceAudience.Private： 仅限于本项目自身
+ * 这个注解知识在逻辑层面上说明，这个类可以被使用的范围，不会带有强制性，随便加，也不会报错。
+ *
+ * Watcher优势 通过watcher，可以避免主动轮询导致的额外负担，更加实时和有效率。
  * This interface specifies the public interface an event handler class must
  * implement. A ZooKeeper client will get various events from the ZooKeeper
  * server it connects to. An application using such a client handles these
  * events by registering a callback object with the client. The callback object
  * is expected to be an instance of a class that implements Watcher interface.
- * 
+ *
+ * @Reader liantengda
+ * 这个借口明确规定一个事件处理类一定要实现这个接口。
+ * 一个zookeeper 客户端 将会从与他连接的服务端捕捉到各种各样的事件。 一个使用这种客户端的应用，处理这些事件
+ * 通过客户端注册的一个回调对象。这个回调对象应该是一个实现了这个观察者接口的类的实例。
+ * 回调对象
  */
 @InterfaceAudience.Public
 public interface Watcher {
 
     /**
+     * 这个接口定义了一个事件可能出现的状态
      * This interface defines the possible states an Event may represent
      */
     @InterfaceAudience.Public
     public interface Event {
         /**
          * Enumeration of states the ZooKeeper may be at the event
+         *
+         * KeeperState代表ZooKeeper的连接状态
          */
         @InterfaceAudience.Public
         public enum KeeperState {
@@ -116,6 +132,8 @@ public interface Watcher {
 
         /**
          * Enumeration of types of events that may occur on the ZooKeeper
+         *
+         * EventType代表node的状态变更
          */
         @InterfaceAudience.Public
         public enum EventType {
@@ -151,5 +169,10 @@ public interface Watcher {
         }
     }
 
+    /**
+     * 当ZNode发生事件变化时，通过process(WatchedEvent event)方法调用DataMonitor的
+     * process(WatchedEvent event)方法。
+     * @param event
+     */
     abstract public void process(WatchedEvent event);
 }

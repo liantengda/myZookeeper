@@ -21,6 +21,10 @@ package org.apache.zookeeper.proto;
 
 import org.apache.jute.*;
 import org.apache.yetus.audience.InterfaceAudience;
+
+/**
+ * 连接响应类
+ */
 @InterfaceAudience.Public
 public class ConnectResponse implements Record {
   private int protocolVersion;
@@ -63,6 +67,7 @@ public class ConnectResponse implements Record {
   public void setPasswd(byte[] m_) {
     passwd=m_;
   }
+  @Override
   public void serialize(OutputArchive a_, String tag) throws java.io.IOException {
     a_.startRecord(this,tag);
     a_.writeInt(protocolVersion,"protocolVersion");
@@ -71,14 +76,19 @@ public class ConnectResponse implements Record {
     a_.writeBuffer(passwd,"passwd");
     a_.endRecord(this,tag);
   }
+
+  @Override
   public void deserialize(InputArchive a_, String tag) throws java.io.IOException {
     a_.startRecord(tag);
     protocolVersion=a_.readInt("protocolVersion");
     timeOut=a_.readInt("timeOut");
     sessionId=a_.readLong("sessionId");
     passwd=a_.readBuffer("passwd");
+    System.out.println("反序列化结果["+"协议版本："+protocolVersion+"，超时时间："+timeOut+"，sessionId："+sessionId+"，密码："+passwd+"]");
     a_.endRecord(tag);
-}
+  }
+
+  @Override
   public String toString() {
     try {
       java.io.ByteArrayOutputStream s =
@@ -125,6 +135,7 @@ public class ConnectResponse implements Record {
     if (ret != 0) return ret;
      return ret;
   }
+  @Override
   public boolean equals(Object peer_) {
     if (!(peer_ instanceof ConnectResponse)) {
       return false;
@@ -144,6 +155,7 @@ public class ConnectResponse implements Record {
     if (!ret) return ret;
      return ret;
   }
+  @Override
   public int hashCode() {
     int result = 17;
     int ret;

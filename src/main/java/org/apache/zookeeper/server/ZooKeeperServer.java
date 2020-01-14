@@ -1,20 +1,4 @@
-/**
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+
 
 package org.apache.zookeeper.server;
 
@@ -73,13 +57,16 @@ import org.slf4j.LoggerFactory;
  * This class implements a simple standalone ZooKeeperServer. It sets up the
  * following chain of RequestProcessors to process requests:
  * PrepRequestProcessor -> SyncRequestProcessor -> FinalRequestProcessor
+ * 这个类实现了一个简单的单例zookeeper服务端，它设定了处理请求的请求处理者处理流程链。
+ * 前请求处理者-->同步请求处理者-->最后请求处理者
+ *
+ * @Reader liantengda
  */
 public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     protected static final Logger LOG;
     
     static {
         LOG = LoggerFactory.getLogger(ZooKeeperServer.class);
-        
         Environment.logEnv("Server environment:", LOG);
     }
 
@@ -95,6 +82,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     }
 
     static public class BasicDataTreeBuilder implements DataTreeBuilder {
+        @Override
         public DataTree build() {
             return new DataTree();
         }
@@ -151,12 +139,15 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
         serverStats = new ServerStats(this);
         listener = new ZooKeeperServerListenerImpl(this);
     }
-    
+
     /**
-     * Creates a ZooKeeperServer instance. It sets everything up, but doesn't
-     * actually start listening for clients until run() is invoked.
-     * 
-     * @param dataDir the directory to put the data
+     *
+     * @param txnLogFactory
+     * @param tickTime
+     * @param minSessionTimeout
+     * @param maxSessionTimeout
+     * @param treeBuilder
+     * @param zkDb
      */
     public ZooKeeperServer(FileTxnSnapLog txnLogFactory, int tickTime,
             int minSessionTimeout, int maxSessionTimeout,
@@ -257,6 +248,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     
     /**
      *  Restore sessions and data
+     *  存储session和数据
      */
     public void loadData() throws IOException, InterruptedException {
         /*
@@ -274,7 +266,13 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
          * been initialized or not. Note that this method is
          * invoked by at least one other method: 
          * ZooKeeperServer#startdata.
-         *  
+         *  这个方法很重要啊，
+         * 当一个新的leader开始执行Leader#lead这个方法时，他就会调用这个方法，但是，在运行leader选举之前数据库已经初始化过了以至于这个服务
+         * 端可以查找到他的zxid为他的初次选举。
+         * 它就会调用QuorumPeer#getLastLoggedZxid这个方法，结果就是，我们不需要再一次的初始化它，并且避免了第二次加载它
+         * 的不利，对于拥有一个大数据库的应用来说，不重载它是非常重要的。
+         *
+         *
          * See ZOOKEEPER-1642 for more detail.
          */
         if(zkDb.isInitialized()){
@@ -349,7 +347,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
             sessionTracker.removeSession(sessionId);
         }
     }
-
+    @Override
     public void expire(Session session) {
         long sessionId = session.getSessionId();
         LOG.info("Expiring session 0x" + Long.toHexString(sessionId)
@@ -708,7 +706,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     public void closeSession(ServerCnxn cnxn, RequestHeader requestHeader) {
         closeSession(cnxn.getSessionId());
     }
-
+    @Override
     public long getServerId() {
         return 0;
     }
@@ -804,6 +802,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * return the last proceesed id from the 
      * datatree
      */
+    @Override
     public long getLastProcessedZxid() {
         return zkDb.getDataTreeLastProcessedZxid();
     }
@@ -813,6 +812,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * in the queue, which havent been 
      * processed yet
      */
+    @Override
     public long getOutstandingRequests() {
         return getInProcess();
     }
@@ -866,7 +866,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
     public FileTxnSnapLog getTxnLogFactory() {
         return this.txnLogFactory;
     }
-
+    @Override
     public String getState() {
         return "standalone";
     }
@@ -879,6 +879,7 @@ public class ZooKeeperServer implements SessionExpirer, ServerStats.Provider {
      * return the total number of client connections that are alive
      * to this server
      */
+    @Override
     public int getNumAliveConnections() {
         return serverCnxnFactory.getNumAliveConnections();
     }
