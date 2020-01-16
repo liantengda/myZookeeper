@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ff116d09-a981-4358-9cb1-fd09e36ac083" name="Default Changelist" comment="" />
+    <list default="true" id="ff116d09-a981-4358-9cb1-fd09e36ac083" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -30,7 +32,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="D:/project/leaderdemo/demo/demo" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -152,6 +154,7 @@
       <workItem from="1578573560789" duration="1367000" />
       <workItem from="1578618323829" duration="25613000" />
       <workItem from="1578983378789" duration="20903000" />
+      <workItem from="1579137339253" duration="268000" />
     </task>
     <task id="LOCAL-00001" summary="全部都提交">
       <created>1579007513215</created>
@@ -211,10 +214,10 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="235" y="0" key="CommitChangelistDialog2/0.0.1366.728@0.0.1366.728" timestamp="1579007740290" />
-    <state x="659" y="111" key="FileChooserDialogImpl" timestamp="1578652717033">
+    <state x="659" y="111" key="FileChooserDialogImpl" timestamp="1579137483363">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="659" y="111" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1578652717033" />
+    <state x="659" y="111" key="FileChooserDialogImpl/0.0.1366.728@0.0.1366.728" timestamp="1579137483363" />
     <state width="1322" height="293" key="GridCell.Tab.0.bottom" timestamp="1579006965597">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -271,10 +274,10 @@
       <screen x="0" y="0" width="1366" height="728" />
     </state>
     <state x="275" y="99" key="Vcs.Push.Dialog.v2/0.0.1366.728@0.0.1366.728" timestamp="1579007564404" />
-    <state x="365" y="258" key="com.intellij.ide.util.TipDialog" timestamp="1578618353960">
+    <state x="365" y="258" key="com.intellij.ide.util.TipDialog" timestamp="1579137350909">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
-    <state x="365" y="258" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1578618353960" />
+    <state x="365" y="258" key="com.intellij.ide.util.TipDialog/0.0.1366.728@0.0.1366.728" timestamp="1579137350909" />
     <state x="424" y="49" width="672" height="678" key="search.everywhere.popup" timestamp="1579006882856">
       <screen x="0" y="0" width="1366" height="728" />
     </state>
@@ -285,7 +288,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/apache/zookeeper/server/ZooKeeperServerMain.java</url>
-          <line>144</line>
+          <line>138</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -295,7 +298,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/org/apache/zookeeper/server/ZooKeeperServerMain.java</url>
-          <line>140</line>
+          <line>134</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
       </breakpoints>
